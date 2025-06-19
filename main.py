@@ -14,7 +14,7 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mouse.set_visible(False)
-        self.screen = pygame.display.set_mode(RES)
+        self.screen = pygame.display.set_mode(RES, pygame.FULLSCREEN)
         self.clock = pygame.time.Clock()
         self.delta_time = 1
         self.map = None
@@ -51,6 +51,7 @@ class Game:
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
+            self.player.single_fire_event(event)
 
     def run(self):
         while True:
