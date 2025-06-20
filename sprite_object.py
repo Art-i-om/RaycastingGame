@@ -5,7 +5,7 @@ from collections import deque
 import os
 
 class SpriteObject:
-    def __init__(self, game, path='resources/sprites/static_sprites/SKULL_TOTEM_01.png',
+    def __init__(self, game, path='resources/sprites/static_sprites/CANDLEBRA.png',
                  pos = (10.5, 3.5), scale=0.7, shift=0.27):
         self.game = game
         self.player = game.player
@@ -87,8 +87,13 @@ class AnimatedSprite(SpriteObject):
 
     def get_images(self, path):
         images = deque()
-        for file_name in os.listdir(path):
+        files = sorted(
+            os.listdir(path),
+            key=lambda name: int(os.path.splitext(name)[0])
+            if os.path.splitext(name)[0].isdigit() else name,
+        )
+        for file_name in files:
             if os.path.isfile(os.path.join(path, file_name)):
-                img = pygame.image.load(path + '/' + file_name).convert_alpha()
+                img = pygame.image.load(os.path.join(path, file_name)).convert_alpha()
                 images.append(img)
         return images
