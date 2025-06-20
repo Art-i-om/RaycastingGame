@@ -8,6 +8,7 @@ class PathFinding:
         self.ways = [-1, 0], [0, -1], [1, 0], [0, 1], [-1, -1], [1, -1], [1, 1], [-1, 1]
         self.graph = {}
         self.get_graph()
+        self.visited = None
 
     def get_path(self, start, goal):
         self.visited = self.bfs(start, goal, self.graph)
@@ -30,7 +31,7 @@ class PathFinding:
             next_nodes = graph[cur_node]
 
             for next_node in next_nodes:
-                if next_node not in visited and next_nodes not in self.game.object_handler.npc_positions:
+                if next_node not in visited and next_node not in self.game.object_handler.npc_positions:
                     queue.append(next_node)
                     visited[next_node] = cur_node
 
