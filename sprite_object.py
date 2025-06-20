@@ -89,8 +89,12 @@ class AnimatedSprite(SpriteObject):
         images = deque()
         files = sorted(
             os.listdir(path),
-            key=lambda name: int(os.path.splitext(name)[0])
-            if os.path.splitext(name)[0].isdigit() else name,
+            key=lambda name: (
+                0,
+                int(os.path.splitext(name)[0])
+            )
+            if os.path.splitext(name)[0].isdigit()
+            else (1, name)
         )
         for file_name in files:
             if os.path.isfile(os.path.join(path, file_name)):

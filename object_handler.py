@@ -12,6 +12,7 @@ class ObjectHandler:
         self.anim_sprite_path = 'resources/sprites/animated_sprites/'
         add_sprite = self.add_sprite
         add_npc = self.add_npc
+        self.npc_positions = {}
 
         add_sprite(SpriteObject(game, pos=(14.75, 1.25)))
         add_sprite(SpriteObject(game, pos=(14.75, 1.75)))
@@ -19,8 +20,10 @@ class ObjectHandler:
         add_sprite(AnimatedSprite(game, pos=(14.75, 7.75)))
 
         add_npc(NPC(game))
+        add_npc(NPC(game, pos=(11.5, 6.5)))
 
     def update(self):
+        self.npc_positions = {npc.map_pos for npc in self.npc_list if npc.alive}
         [sprite.update() for sprite in self.sprite_list]
         [npc.update() for npc in self.npc_list]
 

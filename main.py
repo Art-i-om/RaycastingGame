@@ -9,6 +9,7 @@ from sprite_object import *
 from object_handler import *
 from weapon import *
 from sound import *
+from pathfinding import *
 
 
 class Game:
@@ -18,6 +19,9 @@ class Game:
         self.screen = pygame.display.set_mode(RES, pygame.FULLSCREEN)
         self.clock = pygame.time.Clock()
         self.delta_time = 1
+        self.global_trigger = False
+        self.global_event = pygame.USEREVENT + 0
+        pygame.time.set_timer(self.global_event, 40)
         self.map = None
         self.player = None
         self.raycasting = None
@@ -25,6 +29,7 @@ class Game:
         self.object_handler = None
         self.weapon = None
         self.sound = None
+        self.pathfinding = None
         self.new_game()
 
     def new_game(self):
@@ -35,6 +40,7 @@ class Game:
         self.object_handler = ObjectHandler(self)
         self.weapon = Weapon(self)
         self.sound = Sound(self)
+        self.pathfinding = PathFinding(self)
 
     def update(self):
         self.player.update()
@@ -46,14 +52,20 @@ class Game:
         pygame.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
     def draw(self):
-        self.object_renderer.draw()
-        self.weapon.draw()
+        self.screen.fill('black')
+        # self.object_renderer.draw()
+        # self.weapon.draw()
+        self.map.draw()
+        self.player.draw()
 
     def check_events(self):
+        self.global_trigger = False
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 pygame.quit()
                 sys.exit()
+            elif event.type == self.global_event:
+                self.global_trigger = True
             self.player.single_fire_event(event)
 
     def run(self):
