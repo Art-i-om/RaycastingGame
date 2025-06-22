@@ -21,6 +21,12 @@ class ObjectRenderer:
         self.draw_background()
         self.render_game_objects()
         self.draw_player_health()
+        self.fps_shower()
+
+    def fps_shower(self):
+        fps = self.game.clock.get_fps()
+        fps_surface = pygame.font.SysFont(None, 128).render(f"{fps :.1f}", True, (255, 255, 255))
+        self.game.screen.blit(fps_surface, (WIDTH - 300, 0))
 
     def game_over(self):
         self.screen.blit(self.game_over_image, (0, 0))

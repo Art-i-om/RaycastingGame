@@ -16,7 +16,7 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.mouse.set_visible(False)
-        self.screen = pygame.display.set_mode(RES, pygame.FULLSCREEN)
+        self.screen = pygame.display.set_mode(RES)
         self.clock = pygame.time.Clock()
         self.delta_time = 1
         self.global_trigger = False
@@ -36,6 +36,7 @@ class Game:
         self.map = Map(self)
         self.player = Player(self)
         self.object_renderer = ObjectRenderer(self)
+        # self.raycasting = RayCasting(self)
         self.raycasting = RayCasting(self)
         self.object_handler = ObjectHandler(self)
         self.weapon = Weapon(self)

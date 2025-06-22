@@ -183,3 +183,9 @@ class NPC(AnimatedSprite):
         if self.ray_cast_player_npc():
             pygame.draw.line(self.game.screen, 'orange', (100 * self.game.player.x, 100 * self.game.player.y),
                              (100 * self.x, 100 * self.y), 2)
+
+
+class Soldier(NPC):
+    def __init__(self, game, path='resources/sprites/npc/soldier/0.png', pos=(10.5, 5.5),
+                 scale=0.6, shift=0.38, animation_time=180):
+        super().__init__(game, path, pos, scale, shift, animation_time)
