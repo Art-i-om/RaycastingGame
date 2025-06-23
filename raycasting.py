@@ -3,10 +3,7 @@ import math
 import numpy as np
 from numba import njit
 from settings import *
-from map import mini_map
-
-# Precompute map array for numba JIT function
-MAP_ARRAY = np.array([[cell if cell else 0 for cell in row] for row in mini_map], dtype=np.int32)
+from map import DEFAULT_MAP_PATH
 
 
 @njit(cache=True)
@@ -105,6 +102,11 @@ def ray_casting_jit(ox, oy, player_angle, world_array):
 class RayCasting:
     def __init__(self, game):
         self.game = game
+        self.game.map.load_from_file(DEFAULT_MAP_PATH)
+        self.world_array = np.array(
+            [[cell if cell else 0 for cell in row] for row in self.game.map.mini_map],
+            dtype=np.int32
+        )
         self.ray_casting_result = []
         self.objects_to_render = []
         self.textures = self.game.object_renderer.wall_textures
@@ -152,7 +154,7 @@ class RayCasting:
         ox, oy = self.game.player.pos
 
         depths, proj_heights, textures, offsets = ray_casting_jit(
-            ox, oy, self.game.player.angle, MAP_ARRAY
+            ox, oy, self.game.player.angle, self.world_array
         )
         self.ray_casting_result = [
             (depths[i], proj_heights[i], int(textures[i]), offsets[i])

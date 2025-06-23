@@ -1,9 +1,11 @@
 from collections import deque
+from map import DEFAULT_MAP_PATH
 
 
 class PathFinding:
     def __init__(self, game):
         self.game = game
+        self.game.map.load_from_file(DEFAULT_MAP_PATH)
         self.map = game.map.mini_map
         self.ways = [-1, 0], [0, -1], [1, 0], [0, 1], [-1, -1], [1, -1], [1, 1], [-1, 1]
         self.graph = {}

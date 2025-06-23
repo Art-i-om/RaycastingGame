@@ -12,3 +12,11 @@ class Sound:
         self.npc_attack = pygame.mixer.Sound(self.path + 'npc_attack.wav')
         self.player_pain = pygame.mixer.Sound(self.path + 'player_pain.wav')
         self.shotgun.set_volume(0.5)
+
+    def play_game_music(self):
+        pygame.mixer.music.load(self.path + 'game_theme.mp3')
+        pygame.mixer.music.play()
+
+    def play_main_menu_music(self):
+        pygame.mixer.music.load(self.path + 'main_menu_theme.mp3')
+        pygame.mixer.music.play()

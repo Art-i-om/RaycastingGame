@@ -1,21 +1,20 @@
-import pygame
 import sys
 from settings import *
 from map import *
 from player import *
 from raycasting import *
 from object_renderer import *
-from sprite_object import *
 from object_handler import *
 from weapon import *
 from sound import *
 from pathfinding import *
+from UI.main_menu import *
+from UI.fire_vfx import *
 
 
 class Game:
     def __init__(self):
         pygame.init()
-        pygame.mouse.set_visible(False)
         self.screen = pygame.display.set_mode(RES)
         self.clock = pygame.time.Clock()
         self.delta_time = 1
@@ -30,17 +29,22 @@ class Game:
         self.weapon = None
         self.sound = None
         self.pathfinding = None
-        self.new_game()
+        self.main_menu = None
+        self.fire_vfx = None
+        self.awake_setup()
+
+    def awake_setup(self):
+        self.fire_vfx = FireVfx(self)
+        self.sound = Sound(self)
+        self.main_menu = MainMenu(self)
 
     def new_game(self):
         self.map = Map(self)
         self.player = Player(self)
         self.object_renderer = ObjectRenderer(self)
-        # self.raycasting = RayCasting(self)
         self.raycasting = RayCasting(self)
         self.object_handler = ObjectHandler(self)
         self.weapon = Weapon(self)
-        self.sound = Sound(self)
         self.pathfinding = PathFinding(self)
 
     def update(self):
@@ -70,6 +74,7 @@ class Game:
             self.player.single_fire_event(event)
 
     def run(self):
+        self.sound.play_game_music()
         while True:
             self.check_events()
             self.update()
@@ -78,4 +83,5 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
+    game.main_menu.run()
     game.run()

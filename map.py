@@ -1,3 +1,5 @@
+import json
+
 import pygame
 
 _ = False
@@ -13,10 +15,33 @@ mini_map = [
     [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
 ]
 
+DEFAULT_MAP_PATH = "maps/default.map"
+
 class Map:
-    def __init__(self, game):
+    def __init__(self, game, path=DEFAULT_MAP_PATH):
         self.game = game
-        self.mini_map = mini_map
+        self.mini_map = []
+        self.world_map = {}
+        self.get_map()
+        if path:
+            self.load_from_file(path)
+
+    def load_from_file(self, path):
+        self.mini_map = []
+        try:
+            with open(path, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    if line.startswith("["):
+                        row = json.loads(line)
+                    else:
+                        row = [int(x) for x in line.replace(",", " ").split()]
+                    self.mini_map.append(row)
+        except FileNotFoundError:
+            self.mini_map = []
+
         self.world_map = {}
         self.get_map()
 
