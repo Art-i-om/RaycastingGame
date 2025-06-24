@@ -4,7 +4,7 @@ from sprite_object import *
 
 
 class Weapon(AnimatedSprite):
-    def __init__(self, game, path='resources/sprites/weapon/shotgun2/0.png', scale=0.6, animation_time=80):
+    def __init__(self, game, path='resources/sprites/weapon/shotgun2/1.png', scale=0.6, animation_time=80):
         super().__init__(game, path=path, scale=scale, animation_time=animation_time)
         self.images = deque(
             [pygame.transform.smoothscale(img, (self.image.get_width() * scale, self.image.get_height() * scale))

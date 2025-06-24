@@ -13,30 +13,22 @@ from UI.fire_vfx import *
 
 
 class Game:
-    def __init__(self):
-        pygame.init()
-        self.screen = pygame.display.set_mode(RES)
-        self.clock = pygame.time.Clock()
-        self.delta_time = 1
+    def __init__(self, game_flow):
+        self.game_flow = game_flow
         self.global_trigger = False
         self.global_event = pygame.USEREVENT + 0
         pygame.time.set_timer(self.global_event, 40)
+        self.screen = game_flow.screen
+        self.delta_time = game_flow.delta_time
+        self.clock = game_flow.clock
+        self.sound = game_flow.sound
         self.map = None
         self.player = None
         self.raycasting = None
         self.object_renderer = None
         self.object_handler = None
         self.weapon = None
-        self.sound = None
         self.pathfinding = None
-        self.main_menu = None
-        self.fire_vfx = None
-        self.awake_setup()
-
-    def awake_setup(self):
-        self.fire_vfx = FireVfx(self)
-        self.sound = Sound(self)
-        self.main_menu = MainMenu(self)
 
     def new_game(self):
         self.map = Map(self)
@@ -52,16 +44,12 @@ class Game:
         self.raycasting.update()
         self.object_handler.update()
         self.weapon.update()
-        pygame.display.flip()
         self.delta_time = self.clock.tick(FPS)
-        pygame.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
     def draw(self):
-        # self.screen.fill('black')
         self.object_renderer.draw()
         self.weapon.draw()
-        # self.map.draw()
-        # self.player.draw()
+        pygame.display.flip()
 
     def check_events(self):
         self.global_trigger = False
@@ -74,14 +62,9 @@ class Game:
             self.player.single_fire_event(event)
 
     def run(self):
-        self.sound.play_game_music()
+        pygame.mouse.set_visible(False)
+        self.game_flow.sound.play_game_music()
         while True:
             self.check_events()
             self.update()
             self.draw()
-
-
-if __name__ == '__main__':
-    game = Game()
-    game.main_menu.run()
-    game.run()

@@ -35,6 +35,7 @@ class Player:
     def get_damage(self, damage):
         self.health -= damage
         self.game.object_renderer.player_damage()
+        pygame.display.flip()
         self.game.sound.player_pain.play()
         self.check_game_over()
 
@@ -83,7 +84,7 @@ class Player:
 
     def draw(self):
         pygame.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
-                     (self.x * 100 + WIDTH * math.cos(self.angle),
+                         (self.x * 100 + WIDTH * math.cos(self.angle),
                       self.y * 100 + WIDTH * math.sin(self.angle)), 2)
         pygame.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
 
