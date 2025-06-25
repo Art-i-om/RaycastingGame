@@ -1,27 +1,14 @@
-import json
-
 import pygame
+import csv
 
-_ = False
-mini_map = [
-    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-    [3, _, _, _, _, _, _, _, _, _, _, _, _, _, _, 3],
-    [3, _, _, _, _, 2, 2, _, _, _, _, _, 1, 1, 1, 3],
-    [3, _, _, _, _, _, 2, _, _, _, _, _, 1, _, _, 3],
-    [3, _, _, _, _, _, 2, 2, _, _, _, 1, 1, _, _, 3],
-    [3, _, 1, 1, _, _, _, _, _, _, _, _, _, _, _, 3],
-    [3, _, _, 1, _, _, _, _, _, _, _, _, _, _, _, 3],
-    [3, _, _, 1, _, _, _, _, _, _, _, _, _, _, _, 3],
-    [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-]
-
-DEFAULT_MAP_PATH = "maps/default.map"
 
 class Map:
-    def __init__(self, game, path=DEFAULT_MAP_PATH):
+    def __init__(self, game, path):
         self.game = game
         self.mini_map = []
         self.world_map = {}
+        self.sprite_positions = []
+        self.npc_positions = []
         self.get_map()
         if path:
             self.load_from_file(path)
@@ -29,16 +16,12 @@ class Map:
     def load_from_file(self, path):
         self.mini_map = []
         try:
-            with open(path, "r") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    if line.startswith("["):
-                        row = json.loads(line)
-                    else:
-                        row = [int(x) for x in line.replace(",", " ").split()]
-                    self.mini_map.append(row)
+            with open(path, newline='') as csvfile:
+                reader = csv.reader(csvfile, delimiter=' ')
+                loaded_data = []
+                for row in reader:
+                    loaded_data.append([int(tile) for tile in row])
+                self.mini_map = loaded_data
         except FileNotFoundError:
             self.mini_map = []
 
@@ -46,10 +29,18 @@ class Map:
         self.get_map()
 
     def get_map(self):
+        self.sprite_positions = []
+        self.npc_positions = []
         for j, row in enumerate(self.mini_map):
             for i, value in enumerate(row):
-                if value:
+                if value in (1, 2, 3):
                     self.world_map[(i, j)] = value
+                elif value in (4, 5):
+                    self.sprite_positions.append(((i + 0.5, j + 0.5), value))
+                    row[i] = 0
+                elif value == 6:
+                    self.npc_positions.append(((i + 0.5, j + 0.5), value))
+                    row[i] = 0
 
     def draw(self):
         [pygame.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)

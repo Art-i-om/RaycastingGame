@@ -32,8 +32,7 @@ class MainMenu:
     def check_events(self):
         for event in pygame.event.get():
             if self.start_btn.is_clicked(event):
-                self.game_flow.change_game_state()
-                self.game_flow.run()
+                self.game_flow.level_selector.run()
             if self.quit_btn.is_clicked(event):
                 pygame.quit()
                 sys.exit()

@@ -30,8 +30,8 @@ class Game:
         self.weapon = None
         self.pathfinding = None
 
-    def new_game(self):
-        self.map = Map(self)
+    def new_game(self, filepath):
+        self.map = Map(self, filepath)
         self.player = Player(self)
         self.object_renderer = ObjectRenderer(self)
         self.raycasting = RayCasting(self)

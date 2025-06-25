@@ -3,7 +3,6 @@ import math
 import numpy as np
 from numba import njit
 from settings import *
-from map import DEFAULT_MAP_PATH
 
 
 @njit(cache=True)
@@ -102,7 +101,7 @@ def ray_casting_jit(ox, oy, player_angle, world_array):
 class RayCasting:
     def __init__(self, game):
         self.game = game
-        self.game.map.load_from_file(DEFAULT_MAP_PATH)
+        # self.game.map.load_from_file(DEFAULT_MAP_PATH)
         self.world_array = np.array(
             [[cell if cell else 0 for cell in row] for row in self.game.map.mini_map],
             dtype=np.int32

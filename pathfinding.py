@@ -1,18 +1,21 @@
 from collections import deque
-from map import DEFAULT_MAP_PATH
 
 
 class PathFinding:
     def __init__(self, game):
         self.game = game
-        self.game.map.load_from_file(DEFAULT_MAP_PATH)
-        self.map = game.map.mini_map
+        # self.game.map.load_from_file(DEFAULT_MAP_PATH)
+        # self.map = game.map.mini_map
+        self.map = [row[:] for row in self.game.map.mini_map]
         self.ways = [-1, 0], [0, -1], [1, 0], [0, 1], [-1, -1], [1, -1], [1, 1], [-1, 1]
         self.graph = {}
         self.get_graph()
         self.visited = None
 
     def get_path(self, start, goal):
+        if start not in self.graph or goal not in self.graph:
+            return start
+
         self.visited = self.bfs(start, goal, self.graph)
         path = [goal]
         step = self.visited.get(goal, start)
@@ -45,5 +48,5 @@ class PathFinding:
     def get_graph(self):
         for y, row in enumerate(self.map):
             for x, col in enumerate(row):
-                if not col:
+                if col in (0, 4, 5, 6):
                     self.graph[(x, y)] = self.graph.get((x, y), []) + self.get_next_node(x, y)

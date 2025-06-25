@@ -1,11 +1,14 @@
-# TODO make scrolling up and down
-
+import csv
 import sys
+import os
 import pygame
-
+import tkinter
+from tkinter import filedialog
 from UI.button import ImageButton, RectButton
 
 pygame.init()
+root = tkinter.Tk()
+root.withdraw()
 
 clock = pygame.time.Clock()
 FPS = 120
@@ -24,7 +27,7 @@ TILE_SIZE = 32
 TILE_TYPES = 6
 current_tile = 1
 
-level = 0
+level_name = 'test name'
 scroll_left = False
 scroll_right = False
 scroll_down = False
@@ -42,9 +45,11 @@ for x in range(1, TILE_TYPES + 1):
     img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
     tile_list.append(img)
 
-GREEN = (0, 255, 0)
+DARK_RED = (80, 0, 0)
+BRIGHT_RED = (200, 30, 30)
+DEEP_RED = (150, 0, 0)
+LIGHT_RED = (255, 100, 100)
 WHITE = (255, 255, 255)
-RED = (255, 0, 0)
 
 world_data = []
 for row in range(MAX_ROWS):
@@ -59,10 +64,12 @@ def draw_text(text, text_col, x, y, font=None):
 
 
 def draw_background():
-    screen.fill(GREEN)
+    screen.fill(DARK_RED)
     width = sky_image.get_width()
-    for x in range(6):
-        screen.blit(sky_image, ((x * width) - scroll_x, SCREEN_HEIGHT - sky_image.get_height()))
+    height = sky_image.get_height()
+    for y in range(5):
+        for x in range(6):
+            screen.blit(sky_image, ((x * width) - scroll_x, (y * height) - scroll_y))
 
 
 def draw_grid():
@@ -80,8 +87,22 @@ def draw_world():
                 screen.blit(tile_list[tile], (x * TILE_SIZE - scroll_x, y * TILE_SIZE - scroll_y))
 
 
-save_button = RectButton((SCREEN_WIDTH - 250, SCREEN_HEIGHT + LOWER_MARGIN - 75), (100, 50), "Save")
-load_button = RectButton((SCREEN_WIDTH - 100, SCREEN_HEIGHT + LOWER_MARGIN - 75), (100, 50), "Load")
+save_button = RectButton(
+    (SCREEN_WIDTH - 250, SCREEN_HEIGHT + LOWER_MARGIN - 75),
+    (100, 50),
+    "Save",
+    bg_color=DEEP_RED,
+    hover_color=BRIGHT_RED,
+    text_color=WHITE
+)
+load_button = RectButton(
+    (SCREEN_WIDTH - 100, SCREEN_HEIGHT + LOWER_MARGIN - 75),
+    (100, 50),
+    "Load",
+    bg_color=DEEP_RED,
+    hover_color=BRIGHT_RED,
+    text_color=WHITE
+)
 
 button_list = []
 button_col = 0
@@ -100,6 +121,7 @@ running = True
 while running:
 
     clock.tick(FPS)
+    pygame.display.set_caption(f'{clock.get_fps() :.1f}')
 
     if scroll_left and scroll_x > 0:
         scroll_x -= scroll_speed * scroll_speed_multiplier
@@ -162,20 +184,48 @@ while running:
             if button.is_clicked(event):
                 current_tile = button_count + 1
 
+        if save_button.is_clicked(event):
+            file_path = filedialog.asksaveasfilename(defaultextension=".csv",
+                                                     filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
+                                                     title="Save Level As")
+
+            if file_path:
+                with open(file_path, 'w', newline='') as csvfile:
+                    writer = csv.writer(csvfile, delimiter=' ')
+                    for row in world_data:
+                        writer.writerow(row)
+
+        if load_button.is_clicked(event):
+            file_path = filedialog.askopenfilename(defaultextension=".csv",
+                                                   filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
+                                                   title="Open Level")
+
+            if file_path:
+                scroll_x, scroll_y = 0, 0
+                with open(file_path, newline='') as csvfile:
+                    reader = csv.reader(csvfile, delimiter=' ')
+                    loaded_data = []
+                    for row in reader:
+                        loaded_data.append([int(tile) for tile in row])
+
+                    world_data = loaded_data
+
+                    level_name = os.path.splitext(os.path.basename(file_path))[0]
+
     draw_background()
     draw_grid()
     draw_world()
 
-    pygame.draw.rect(screen, GREEN, (0, SCREEN_HEIGHT, SCREEN_WIDTH + SIDE_MARGIN, LOWER_MARGIN))
+    pygame.draw.rect(screen, DEEP_RED, (0, SCREEN_HEIGHT, SCREEN_WIDTH + SIDE_MARGIN, LOWER_MARGIN))
     save_button.draw(screen)
     load_button.draw(screen)
 
-    pygame.draw.rect(screen, GREEN, (SCREEN_WIDTH, 0, SIDE_MARGIN, SCREEN_HEIGHT))
-    draw_text(f'Level: {level}', WHITE, 10, SCREEN_HEIGHT + LOWER_MARGIN - 90)
+    pygame.draw.rect(screen, DARK_RED, (SCREEN_WIDTH, 0, SIDE_MARGIN, SCREEN_HEIGHT))
+    draw_text(f'Level name: {level_name}', WHITE, 10, SCREEN_HEIGHT + LOWER_MARGIN - 90)
 
     for button in button_list:
         button.draw(screen)
 
-    pygame.draw.rect(screen, RED, button_list[current_tile - 1].rect, 3)
+    pygame.draw.rect(screen, BRIGHT_RED, button_list[current_tile - 1].rect, 3)
 
     pygame.display.flip()
