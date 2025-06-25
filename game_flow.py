@@ -1,7 +1,3 @@
-import pygame
-from UI.fire_vfx import *
-from sound import *
-from UI.main_menu import *
 from UI.level_selector import LevelSelectorMenu
 from game import *
 from settings import *
@@ -19,9 +15,6 @@ class GameFlow:
         self.sound = None
         self.main_menu = None
         self.level_selector = None
-        self.running_game = False
-        self.in_main_menu = True
-        self.in_level_selector= False
         self.awake_setup()
 
     def awake_setup(self):
