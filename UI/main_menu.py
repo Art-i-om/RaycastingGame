@@ -27,7 +27,7 @@ class MainMenu:
         if self.start_logo_y > self.logo_y:
             self.start_logo_y -= 4
         self.logo_surf.blit(self.logo, (self.logo_x, self.start_logo_y))
-        self.game_flow.screen.blit(self.logo_surf, (0, 0))
+        self.game_flow.display.blit(self.logo_surf, (0, 0))
 
     def check_events(self):
         for event in pygame.event.get():
@@ -45,8 +45,8 @@ class MainMenu:
 
         self.game_flow.fire_vfx.draw()
 
-        self.start_btn.draw(self.game_flow.screen)
-        self.quit_btn.draw(self.game_flow.screen)
+        self.start_btn.draw(self.game_flow.display)
+        self.quit_btn.draw(self.game_flow.display)
 
         pygame.display.flip()
 

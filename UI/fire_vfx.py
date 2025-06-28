@@ -31,7 +31,7 @@ class FireVfx:
                                                    PIXEL_SIZE, PIXEL_SIZE), color)
 
         for i in range(FIRE_REPS):
-            self.game.screen.blit(self.fire_surf, (self.fire_surf.get_width() * i, 0))
+            self.game.display.blit(self.fire_surf, (self.fire_surf.get_width() * i, 0))
 
     def get_fire_array(self):
         fire_array = [[0 for i in range(FIRE_WIDTH)] for j in range(FIRE_HEIGHT)]

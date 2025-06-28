@@ -30,7 +30,7 @@ class Player:
             self.game.object_renderer.game_over()
             pygame.display.flip()
             pygame.time.delay(1500)
-            self.game.new_game()
+            self.game.game_flow.load_level('maps/Level1.csv')
 
     def get_damage(self, damage):
         self.health -= damage
@@ -83,10 +83,10 @@ class Player:
             self.y += dy
 
     def draw(self):
-        pygame.draw.line(self.game.screen, 'yellow', (self.x * 100, self.y * 100),
+        pygame.draw.line(self.game.display, 'yellow', (self.x * 100, self.y * 100),
                          (self.x * 100 + WIDTH * math.cos(self.angle),
                       self.y * 100 + WIDTH * math.sin(self.angle)), 2)
-        pygame.draw.circle(self.game.screen, 'green', (self.x * 100, self.y * 100), 15)
+        pygame.draw.circle(self.game.display, 'green', (self.x * 100, self.y * 100), 15)
 
     def mouse_control(self):
         mx, my = pygame.mouse.get_pos()

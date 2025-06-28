@@ -43,5 +43,5 @@ class Map:
                     row[i] = 0
 
     def draw(self):
-        [pygame.draw.rect(self.game.screen, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
+        [pygame.draw.rect(self.game.display, 'darkgray', (pos[0] * 100, pos[1] * 100, 100, 100), 2)
          for pos in self.world_map]

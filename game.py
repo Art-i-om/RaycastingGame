@@ -18,7 +18,7 @@ class Game:
         self.global_trigger = False
         self.global_event = pygame.USEREVENT + 0
         pygame.time.set_timer(self.global_event, 40)
-        self.screen = game_flow.screen
+        self.display = game_flow.display
         self.delta_time = game_flow.delta_time
         self.clock = game_flow.clock
         self.sound = game_flow.sound
@@ -33,7 +33,7 @@ class Game:
     def new_game(self, filepath):
         self.map = Map(self, filepath)
         self.player = Player(self)
-        self.object_renderer = ObjectRenderer(self)
+        self.object_renderer = ObjectRenderer(self, self.game_flow.ctx)
         self.raycasting = RayCasting(self)
         self.object_handler = ObjectHandler(self)
         self.weapon = Weapon(self)
@@ -48,8 +48,6 @@ class Game:
 
     def draw(self):
         self.object_renderer.draw()
-        self.weapon.draw()
-        pygame.display.flip()
 
     def check_events(self):
         self.global_trigger = False

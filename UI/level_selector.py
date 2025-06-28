@@ -47,10 +47,10 @@ class LevelSelectorMenu:
             self.draw()
 
     def draw(self):
-        self.game_flow.screen.fill((0, 0, 0))
+        self.game_flow.display.fill((0, 0, 0))
         for button in self.level_buttons:
-            button.draw(self.game_flow.screen)
-        self.load_file_btn.draw(self.game_flow.screen)
+            button.draw(self.game_flow.display)
+        self.load_file_btn.draw(self.game_flow.display)
         pygame.display.flip()
 
     def load_premade_level(self, index):

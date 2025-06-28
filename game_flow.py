@@ -1,12 +1,17 @@
+import pygame
+
 from UI.level_selector import LevelSelectorMenu
 from game import *
 from settings import *
+import moderngl
 
 
 class GameFlow:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode(RES)
+        self.screen = pygame.display.set_mode(RES, pygame.OPENGL | pygame.DOUBLEBUF)
+        self.display = pygame.Surface(self.screen.get_size())
+        self.ctx = moderngl.create_context()
         self.clock = pygame.time.Clock()
         self.delta_time = 1
         self.file_path = None
@@ -41,4 +46,4 @@ class GameFlow:
 
 if __name__ == '__main__':
     game_flow = GameFlow()
-    game_flow.to_main_menu()
+    game_flow.load_level('maps/Level1.csv')

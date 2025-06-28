@@ -1,10 +1,12 @@
-import pygame
 from settings import *
+from GL_renderer import *
 
 
 class ObjectRenderer:
-    def __init__(self, game):
+    def __init__(self, game, ctx):
+        self.ctx = ctx
         self.game = game
+        self.gl_renderer = GLRenderer(game, ctx)
         self.wall_textures = self.load_wall_texture()
         self.sky_image_front = self.get_texture('resources/textures/sky.png', (WIDTH, HALF_HEIGHT))
         self.sky_image_back = self.get_texture('resources/textures/sky.png', (WIDTH, HALF_HEIGHT))
@@ -21,36 +23,44 @@ class ObjectRenderer:
         self.render_game_objects()
         self.draw_player_health()
         self.fps_shower()
+        self.draw_weapon()
+
+        self.gl_renderer.apply_texture(self.game.display)
+
+        pygame.display.flip()
+
+    def draw_weapon(self):
+        self.game.weapon.draw()
 
     def fps_shower(self):
         fps = self.game.clock.get_fps()
         fps_surface = pygame.font.SysFont(None, 128).render(f"{fps :.1f}", True, (255, 255, 255))
-        self.game.screen.blit(fps_surface, (WIDTH - 300, 0))
+        self.game.display.blit(fps_surface, (WIDTH - 300, 0))
 
     def game_over(self):
-        self.game.screen.blit(self.game_over_image, (0, 0))
+        self.game.display.blit(self.game_over_image, (0, 0))
 
     def draw_player_health(self):
         health = str(self.game.player.health)
         offset = 30
         for i, char in enumerate(health):
-            self.game.screen.blit(self.digits[char], (i * self.digit_size + offset, 0))
-        self.game.screen.blit(self.digits['10'], ((i + 1) * self.digit_size + offset, 0))
+            self.game.display.blit(self.digits[char], (i * self.digit_size + offset, 0))
+        self.game.display.blit(self.digits['10'], ((i + 1) * self.digit_size + offset, 0))
 
     def player_damage(self):
-        self.game.screen.blit(self.blood_screen, (0, 0))
+        self.game.display.blit(self.blood_screen, (0, 0))
 
     def draw_background(self):
         self.sky_offset = (self.sky_offset + 4.5 * self.game.player.rel) % WIDTH
-        self.game.screen.blit(self.sky_image_front, (-self.sky_offset, 0))
-        self.game.screen.blit(self.sky_image_back, (-self.sky_offset + WIDTH, 0))
+        self.game.display.blit(self.sky_image_front, (-self.sky_offset, 0))
+        self.game.display.blit(self.sky_image_back, (-self.sky_offset + WIDTH, 0))
 
-        pygame.draw.rect(self.game.screen, FLOOR_COLOR, (0, HALF_HEIGHT, WIDTH, HEIGHT))
+        pygame.draw.rect(self.game.display, FLOOR_COLOR, (0, HALF_HEIGHT, WIDTH, HEIGHT))
 
     def render_game_objects(self):
         list_objects = sorted(self.game.raycasting.objects_to_render, key=lambda t: t[0], reverse=True)
         for depth, image, pos in list_objects:
-            self.game.screen.blit(image, pos)
+            self.game.display.blit(image, pos)
 
     @staticmethod
     def get_texture(path, res=(TEXTURE_SIZE, TEXTURE_SIZE)):
