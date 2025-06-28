@@ -48,6 +48,8 @@ class MainMenu:
         self.start_btn.draw(self.game_flow.display)
         self.quit_btn.draw(self.game_flow.display)
 
+        self.game_flow.gl_renderer.apply_texture(self.game_flow.display)
+
         pygame.display.flip()
 
     def run(self):

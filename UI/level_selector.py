@@ -51,6 +51,9 @@ class LevelSelectorMenu:
         for button in self.level_buttons:
             button.draw(self.game_flow.display)
         self.load_file_btn.draw(self.game_flow.display)
+
+        self.game_flow.gl_renderer.apply_texture(self.game_flow.display)
+
         pygame.display.flip()
 
     def load_premade_level(self, index):
