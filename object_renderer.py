@@ -1,5 +1,6 @@
 from settings import *
 from GL_renderer import *
+import pygame
 
 
 class ObjectRenderer:
@@ -18,11 +19,18 @@ class ObjectRenderer:
         self.digits = dict(zip(map(str, range(11)), self.digit_images))
         self.game_over_image = self.get_texture('resources/textures/game_over.png', RES)
 
+        self.show_blood = False
+        self.blood_end_time = 0
+
     def draw(self):
         self.draw_background()
         self.render_game_objects()
+
+        if self.show_blood:
+            self.show_blood_screen()
+
         self.draw_player_health()
-        self.fps_shower()
+        # self.fps_shower()
         self.draw_weapon()
 
         self.gl_renderer.apply_texture(self.game.display)
@@ -47,8 +55,15 @@ class ObjectRenderer:
             self.game.display.blit(self.digits[char], (i * self.digit_size + offset, 0))
         self.game.display.blit(self.digits['10'], ((i + 1) * self.digit_size + offset, 0))
 
-    def player_damage(self):
+    def player_damage(self, duration=50.0):
+        self.show_blood = True
+        self.blood_end_time = pygame.time.get_ticks() + duration
+
+    def show_blood_screen(self):
         self.game.display.blit(self.blood_screen, (0, 0))
+        if pygame.time.get_ticks() > self.blood_end_time:
+            self.show_blood = False
+            self.game.display.fill((0, 0, 0, 0))
 
     def draw_background(self):
         self.sky_offset = (self.sky_offset + 4.5 * self.game.player.rel) % WIDTH

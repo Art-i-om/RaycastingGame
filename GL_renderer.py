@@ -24,7 +24,7 @@ class GLRenderer:
 
     def create_texture(self, surface: pygame.Surface):
         texture = self.ctx.texture(surface.get_size(), 4)
-        texture.filter = (moderngl.NEAREST, moderngl.NEAREST) # maybe change NEAREST later
+        texture.filter = (moderngl.NEAREST, moderngl.LINEAR) # maybe change NEAREST later
         texture.swizzle = 'BGRA'
         return texture
 
