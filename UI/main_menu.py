@@ -1,4 +1,6 @@
 import pygame
+
+from UI.fire_vfx import FireVfx
 from settings import *
 from UI.button import RectButton
 import sys
@@ -20,6 +22,7 @@ class MainMenu:
                                     HEIGHT // 4 - self.logo.get_height() // 2)
         self.start_logo_y = HEIGHT
         self.logo_surf = pygame.Surface([WIDTH, HEIGHT])
+        self.fire_vfx = None
         self.running = True
 
     def draw_logo(self):
@@ -32,18 +35,19 @@ class MainMenu:
     def check_events(self):
         for event in pygame.event.get():
             if self.start_btn.is_clicked(event):
+                self.running = False
                 self.game_flow.level_selector.run()
             if self.quit_btn.is_clicked(event):
                 pygame.quit()
                 sys.exit()
 
     def update(self):
-        self.game_flow.fire_vfx.update()
+        self.fire_vfx.update()
 
     def draw(self):
         self.draw_logo()
 
-        self.game_flow.fire_vfx.draw()
+        self.fire_vfx.draw()
 
         self.start_btn.draw(self.game_flow.display)
         self.quit_btn.draw(self.game_flow.display)
@@ -53,6 +57,9 @@ class MainMenu:
         pygame.display.flip()
 
     def run(self):
+        self.running = True
+        self.start_logo_y = HEIGHT
+        self.fire_vfx = FireVfx(self.game_flow)
         pygame.mouse.set_visible(True)
         self.game_flow.sound.play_main_menu_music()
         while self.running:

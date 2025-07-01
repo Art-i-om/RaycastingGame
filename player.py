@@ -6,7 +6,11 @@ import math
 class Player:
     def __init__(self, game):
         self.game = game
-        self.x, self.y = PLAYER_POS
+        # Use spawn position from map if available, otherwise use default
+        if self.game.map.player_spawn_pos:
+            self.x, self.y = self.game.map.player_spawn_pos
+        else:
+            self.x, self.y = PLAYER_POS  # Fallback to default position
         self.angle = PLAYER_ANGLE
         self.rel = None
         self.shot = False
@@ -27,10 +31,7 @@ class Player:
 
     def check_game_over(self):
         if self.health < 1:
-            self.game.object_renderer.game_over()
-            pygame.display.flip()
-            pygame.time.delay(1500)
-            self.game.game_flow.load_level('maps/Level1.csv')
+            self.game.game_flow.to_game_over_menu()
 
     def get_damage(self, damage):
         self.health -= damage

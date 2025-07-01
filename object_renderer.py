@@ -30,7 +30,7 @@ class ObjectRenderer:
             self.show_blood_screen()
 
         self.draw_player_health()
-        # self.fps_shower()
+        self.fps_shower()
         self.draw_weapon()
 
         self.gl_renderer.apply_texture(self.game.display)
@@ -84,7 +84,7 @@ class ObjectRenderer:
 
     def load_wall_texture(self):
         return {
-            1: self.get_texture('resources/textures/1.png'),
-            2: self.get_texture('resources/textures/2.png'),
-            3: self.get_texture('resources/textures/3.png')
+            2: self.get_texture('resources/textures/1.png'),  # Changed from 1 to 2
+            3: self.get_texture('resources/textures/2.png'),  # Changed from 2 to 3
+            4: self.get_texture('resources/textures/3.png')   # Changed from 3 to 4
         }

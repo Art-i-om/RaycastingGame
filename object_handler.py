@@ -15,13 +15,13 @@ class ObjectHandler:
 
     def load_sprites_from_map(self, sprite_positions, npc_positions):
         for pos, sprite_id in sprite_positions:
-            if sprite_id == 4:
+            if sprite_id == 5:  # Changed from 4 to 5
                 self.add_sprite(SpriteObject(self.game, pos=pos))
-            elif sprite_id == 5:
+            elif sprite_id == 6:  # Changed from 5 to 6
                 self.add_sprite(AnimatedSprite(self.game, pos=pos))
 
         for pos, sprite_id in npc_positions:
-            if sprite_id == 6:
+            if sprite_id == 7:  # Changed from 6 to 7
                 self.add_npc(Soldier(self.game, pos=pos))
 
     def update(self):

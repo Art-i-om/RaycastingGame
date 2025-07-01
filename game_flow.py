@@ -1,6 +1,7 @@
 import pygame
 
 from UI.level_selector import LevelSelectorMenu
+from UI.game_over import GameOverMenu
 from game import *
 from settings import *
 import moderngl
@@ -17,22 +18,25 @@ class GameFlow:
         self.gl_renderer = None
         self.file_path = None
         self.game = None
-        self.fire_vfx = None
         self.sound = None
         self.main_menu = None
         self.level_selector = None
+        self.game_over = None
         self.awake_setup()
 
     def awake_setup(self):
-        self.fire_vfx = FireVfx(self)
         self.sound = Sound(self)
         self.level_selector = LevelSelectorMenu(self)
         self.main_menu = MainMenu(self)
+        self.game_over = GameOverMenu(self)
         self.game = Game(self)
         self.gl_renderer = GLRenderer(self.game, self.ctx)
 
     def play(self):
         self.game.run()
+
+    def to_game_over_menu(self):
+        self.game_over.run()
 
     def to_main_menu(self):
         self.main_menu.run()
@@ -49,4 +53,3 @@ class GameFlow:
 if __name__ == '__main__':
     game_flow = GameFlow()
     game_flow.to_main_menu()
-    # game_flow.load_level('maps/Level1.csv')

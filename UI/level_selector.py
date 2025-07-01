@@ -12,19 +12,23 @@ class LevelSelectorMenu:
         self.font = pygame.font.Font('resources/fonts/RetroBanker.ttf', 40)
         self.running = True
 
-        self.levels_count = 2
+        self.levels_count = 5
         self.level_buttons = []
         for i in range(self.levels_count):
-            level_button = RectButton(pos=(HALF_WIDTH - 150, HALF_HEIGHT - 200 + (60 * i)), size=(300, 60),
+            level_button = RectButton(pos=(HALF_WIDTH - 150, HALF_HEIGHT - 400 + (60 * i)), size=(300, 60),
                                       font=self.font, text=f'Level {i + 1}',
                                       bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100)
             )
             self.level_buttons.append(level_button)
 
 
-        self.load_file_btn = RectButton(pos=(HALF_WIDTH - 150, HEIGHT - 300), size=(300, 60),
+        self.load_file_btn = RectButton(pos=(HALF_WIDTH - 150, HEIGHT - 500), size=(300, 60),
                                         font=self.font, text='Load level',
                                         bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100)
+        )
+        self.back_button = RectButton(pos=(HALF_WIDTH - 150, HEIGHT - 400), size=(300, 60),
+                                      font=self.font, text='Back',
+                                      bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100)
         )
 
     def check_events(self):
@@ -40,7 +44,12 @@ class LevelSelectorMenu:
             if self.load_file_btn.is_clicked(event):
                 self.load_csv_level()
 
+            if self.back_button.is_clicked(event):
+                self.running = False
+                self.game_flow.to_main_menu()
+
     def run(self):
+        self.running = True
         pygame.mouse.set_visible(True)
         while self.running:
             self.check_events()
@@ -51,6 +60,7 @@ class LevelSelectorMenu:
         for button in self.level_buttons:
             button.draw(self.game_flow.display)
         self.load_file_btn.draw(self.game_flow.display)
+        self.back_button.draw(self.game_flow.display)
 
         self.game_flow.gl_renderer.apply_texture(self.game_flow.display)
 

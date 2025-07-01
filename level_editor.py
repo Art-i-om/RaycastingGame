@@ -11,10 +11,10 @@ root = tkinter.Tk()
 root.withdraw()
 
 clock = pygame.time.Clock()
-FPS = 120
+FPS = 200
 
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 640
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 600
 LOWER_MARGIN = 100
 SIDE_MARGIN = 300
 
@@ -24,8 +24,9 @@ pygame.display.set_caption('Level Editor')
 MAX_ROWS = 150
 MAX_COLS = 150
 TILE_SIZE = 32
-TILE_TYPES = 6
+TILE_TYPES = 7
 current_tile = 1
+player_placed = False
 
 level_name = 'test name'
 scroll_left = False
@@ -147,9 +148,16 @@ while running:
 
     if mouse_pos[0] < SCREEN_WIDTH and mouse_pos[1] < SCREEN_HEIGHT:
             if pygame.mouse.get_pressed()[0] == 1:
-                if world_data[y][x] != current_tile:
-                    world_data[y][x] = current_tile
+                if current_tile == 1:
+                    if not player_placed and world_data[y][x] != 1:
+                        world_data[y][x] = 1
+                        player_placed = True
+                else:
+                    if world_data[y][x] != current_tile:
+                        world_data[y][x] = current_tile
             if pygame.mouse.get_pressed()[2] == 1:
+                if player_placed and world_data[y][x] == 1:
+                    player_placed = False
                 world_data[y][x] = 0
 
     for event in pygame.event.get():
@@ -229,3 +237,27 @@ while running:
     pygame.draw.rect(screen, BRIGHT_RED, button_list[current_tile - 1].rect, 3)
 
     pygame.display.flip()
+
+
+# class LevelEditor:
+#     def __init__(self):
+#         self.running = True
+#         self.delta_time = 1
+#
+#     def check_events(self):
+#         for event in pygame.event.get():
+#             if event.type == pygame.QUIT:
+#                 self.running = False
+#
+#     def update(self):
+#         self.delta_time = clock.tick(FPS)
+#
+#     def draw(self):
+#         pygame.display.flip()
+#
+#     def run(self):
+#         self.running = True
+#         while self.running:
+#             self.check_events()
+#             self.update()
+#             self.draw()
