@@ -5,259 +5,235 @@ import pygame
 import tkinter
 from tkinter import filedialog
 from UI.button import ImageButton, RectButton
-
-pygame.init()
-root = tkinter.Tk()
-root.withdraw()
-
-clock = pygame.time.Clock()
-FPS = 200
-
-SCREEN_WIDTH = 1200
-SCREEN_HEIGHT = 600
-LOWER_MARGIN = 100
-SIDE_MARGIN = 300
-
-screen = pygame.display.set_mode((SCREEN_WIDTH + SIDE_MARGIN, SCREEN_HEIGHT + LOWER_MARGIN))
-pygame.display.set_caption('Level Editor')
-
-MAX_ROWS = 150
-MAX_COLS = 150
-TILE_SIZE = 32
-TILE_TYPES = 7
-current_tile = 1
-player_placed = False
-
-level_name = 'test name'
-scroll_left = False
-scroll_right = False
-scroll_down = False
-scroll_up = False
-scroll_x = 0
-scroll_y = 0
-scroll_speed = 5
-scroll_speed_multiplier = 1
-
-sky_image = pygame.image.load('resources/textures/level_editor_background.png').convert_alpha()
-
-tile_list = [None]
-for x in range(1, TILE_TYPES + 1):
-    img = pygame.image.load(f'resources/tilemap_editor/{x}.png').convert_alpha()
-    img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
-    tile_list.append(img)
-
-DARK_RED = (80, 0, 0)
-BRIGHT_RED = (200, 30, 30)
-DEEP_RED = (150, 0, 0)
-LIGHT_RED = (255, 100, 100)
-WHITE = (255, 255, 255)
-
-world_data = []
-for row in range(MAX_ROWS):
-    r = [0] * MAX_COLS
-    world_data.append(r)
+from settings import *
 
 
-def draw_text(text, text_col, x, y, font=None):
-    font = font or pygame.font.Font('resources/fonts/RetroBanker.ttf', 40)
-    img = font.render(text, True, text_col)
-    screen.blit(img, (x, y))
+class LevelEditor:
+    def __init__(self, game_flow):
+        self.game_flow = game_flow
+        self.display = game_flow.display
+        self.running = True
+        self.delta_time = 1
+        self.current_tile = 1
+        self.player_placed = False
+        self.root = tkinter.Tk()
+        self.root.withdraw()
+        self.clock = game_flow.clock
+        self.level_name = None
+        self.scroll_left = False
+        self.scroll_right = False
+        self.scroll_down = False
+        self.scroll_up = False
+        self.scroll_x = 0
+        self.scroll_y = 0
+        self.scroll_speed = 5
+        self.scroll_speed_multiplier = 1
+        self.sky_image = pygame.image.load('resources/textures/level_editor_background.png').convert_alpha()
+        self.tile_list = [None]
+        for x in range(1, TILE_TYPES + 1):
+            img = pygame.image.load(f'resources/tilemap_editor/{x}.png').convert_alpha()
+            img = pygame.transform.scale(img, (TILE_SIZE, TILE_SIZE))
+            self.tile_list.append(img)
+        self.world_data = []
+        for row in range(MAX_ROWS):
+            r = [0] * MAX_COLS
+            self.world_data.append(r)
+        self.save_button = RectButton(
+            (EDITOR_WIDTH - 250, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (100, 50),
+            "Save",
+            bg_color=DEEP_RED,
+            hover_color=BRIGHT_RED,
+            text_color=WHITE
+        )
+        self.load_button = RectButton(
+            (EDITOR_WIDTH - 100, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (100, 50),
+            "Load",
+            bg_color=DEEP_RED,
+            hover_color=BRIGHT_RED,
+            text_color=WHITE
+        )
+        self.exit_button = RectButton(
+            (EDITOR_WIDTH + 150, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (100, 50),
+            "Exit",
+            bg_color=DEEP_RED,
+            hover_color=BRIGHT_RED,
+            text_color=WHITE
+        )
+        self.button_list = []
+        self.button_col = 0
+        self.button_row = 0
+        for i in range(1, len(self.tile_list)):
+            img = self.tile_list[i]
+            tile_button = ImageButton(pos=(EDITOR_WIDTH + (75 * self.button_col) + 50, 75 * self.button_row + 50),
+                                      size=(img.get_width(), img.get_height()), image=img)
+            self.button_list.append(tile_button)
+            self.button_col += 1
+            if self.button_col == 3:
+                self.button_row += 1
+                self.button_col = 0
 
+    def draw_world(self):
+        for y, row in enumerate(self.world_data):
+            for x, tile in enumerate(row):
+                if tile > 0:
+                    self.display.blit(self.tile_list[tile], (x * TILE_SIZE - self.scroll_x, y * TILE_SIZE - self.scroll_y))
 
-def draw_background():
-    screen.fill(DARK_RED)
-    width = sky_image.get_width()
-    height = sky_image.get_height()
-    for y in range(5):
-        for x in range(6):
-            screen.blit(sky_image, ((x * width) - scroll_x, (y * height) - scroll_y))
+    def draw_grid(self):
+        for c in range(MAX_COLS + 1):
+            pygame.draw.line(self.display, WHITE, (c * TILE_SIZE - self.scroll_x, 0), (c * TILE_SIZE - self.scroll_x, EDITOR_HEIGHT))
 
+        for r in range(MAX_ROWS + 1):
+            pygame.draw.line(self.display, WHITE, (0, r * TILE_SIZE - self.scroll_y), (EDITOR_WIDTH, r * TILE_SIZE - self.scroll_y))
 
-def draw_grid():
-    for c in range(MAX_COLS + 1):
-        pygame.draw.line(screen, WHITE, (c * TILE_SIZE - scroll_x, 0), (c * TILE_SIZE - scroll_x, SCREEN_HEIGHT))
+    def draw_background(self):
+        self.display.fill(DARK_RED)
+        width = self.sky_image.get_width()
+        height = self.sky_image.get_height()
+        for y in range(5):
+            for x in range(6):
+                self.display.blit(self.sky_image, ((x * width) - self.scroll_x, (y * height) - self.scroll_y))
 
-    for r in range(MAX_ROWS + 1):
-        pygame.draw.line(screen, WHITE, (0, r * TILE_SIZE - scroll_y), (SCREEN_WIDTH, r * TILE_SIZE - scroll_y))
+    def draw_text(self, text, text_col, x, y, font=None):
+        font = font or pygame.font.Font('resources/fonts/RetroBanker.ttf', 40)
+        img = font.render(text, True, text_col)
+        self.display.blit(img, (x, y))
 
+    def scroll(self):
+        if self.scroll_left and self.scroll_x > 0:
+            self.scroll_x -= self.scroll_speed * self.scroll_speed_multiplier
+        if self.scroll_right and self.scroll_x < (MAX_COLS * TILE_SIZE) - EDITOR_WIDTH:
+            self.scroll_x += self.scroll_speed * self.scroll_speed_multiplier
+        if self.scroll_up and self.scroll_y > 0:
+            self.scroll_y -= self.scroll_speed * self.scroll_speed_multiplier
+        if self.scroll_down and self.scroll_y < (MAX_ROWS * TILE_SIZE) - EDITOR_HEIGHT:
+            self.scroll_y += self.scroll_speed * self.scroll_speed_multiplier
 
-def draw_world():
-    for y, row in enumerate(world_data):
-        for x, tile in enumerate(row):
-            if tile > 0:
-                screen.blit(tile_list[tile], (x * TILE_SIZE - scroll_x, y * TILE_SIZE - scroll_y))
+        if self.scroll_x < 0:
+            self.scroll_x = 0
+        if self.scroll_x > (MAX_COLS * TILE_SIZE) - EDITOR_WIDTH:
+            self.scroll_x = (MAX_COLS * TILE_SIZE) - EDITOR_WIDTH
+        if self.scroll_y < 0:
+            self.scroll_y = 0
+        if self.scroll_y > (MAX_ROWS * TILE_SIZE) - EDITOR_HEIGHT:
+            self.scroll_y = (MAX_ROWS * TILE_SIZE) - EDITOR_HEIGHT
 
+    def check_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
 
-save_button = RectButton(
-    (SCREEN_WIDTH - 250, SCREEN_HEIGHT + LOWER_MARGIN - 75),
-    (100, 50),
-    "Save",
-    bg_color=DEEP_RED,
-    hover_color=BRIGHT_RED,
-    text_color=WHITE
-)
-load_button = RectButton(
-    (SCREEN_WIDTH - 100, SCREEN_HEIGHT + LOWER_MARGIN - 75),
-    (100, 50),
-    "Load",
-    bg_color=DEEP_RED,
-    hover_color=BRIGHT_RED,
-    text_color=WHITE
-)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    self.scroll_left = True
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    self.scroll_right = True
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    self.scroll_up = True
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    self.scroll_down = True
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    self.scroll_speed_multiplier = 4
 
-button_list = []
-button_col = 0
-button_row = 0
-for i in range(1, len(tile_list)):
-    img = tile_list[i]
-    tile_button = ImageButton(pos=(SCREEN_WIDTH + (75 * button_col) + 50, 75 * button_row + 50),
-                         size=(img.get_width(), img.get_height()), image=img)
-    button_list.append(tile_button)
-    button_col += 1
-    if button_col == 3:
-        button_row += 1
-        button_col = 0
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                    self.scroll_left = False
+                if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                    self.scroll_right = False
+                if event.key == pygame.K_UP or event.key == pygame.K_w:
+                    self.scroll_up = False
+                if event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                    self.scroll_down = False
+                if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
+                    self.scroll_speed_multiplier = 1
 
-running = True
-while running:
+            for button_count, button in enumerate(self.button_list):
+                if button.is_clicked(event):
+                    self.current_tile = button_count + 1
 
-    clock.tick(FPS)
-    pygame.display.set_caption(f'{clock.get_fps() :.1f}')
+            if self.save_button.is_clicked(event):
+                file_path = filedialog.asksaveasfilename(defaultextension=".csv",
+                                                        filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
+                                                        title="Save Level As")
 
-    if scroll_left and scroll_x > 0:
-        scroll_x -= scroll_speed * scroll_speed_multiplier
-    if scroll_right and scroll_x < (MAX_COLS * TILE_SIZE) - SCREEN_WIDTH:
-        scroll_x += scroll_speed * scroll_speed_multiplier
-    if scroll_up and scroll_y > 0:
-        scroll_y -= scroll_speed * scroll_speed_multiplier
-    if scroll_down and scroll_y < (MAX_ROWS * TILE_SIZE) - SCREEN_HEIGHT:
-        scroll_y += scroll_speed * scroll_speed_multiplier
+                if file_path:
+                    with open(file_path, 'w', newline='') as csvfile:
+                        writer = csv.writer(csvfile, delimiter=' ')
+                        for row in self.world_data:
+                            writer.writerow(row)
 
-    if scroll_x < 0:
-        scroll_x = 0
-    if scroll_x > (MAX_COLS * TILE_SIZE) - SCREEN_WIDTH:
-        scroll_x = (MAX_COLS * TILE_SIZE) - SCREEN_WIDTH
-    if scroll_y < 0:
-        scroll_y = 0
-    if scroll_y > (MAX_ROWS * TILE_SIZE) - SCREEN_HEIGHT:
-        scroll_y = (MAX_ROWS * TILE_SIZE) - SCREEN_HEIGHT
+            if self.load_button.is_clicked(event):
+                file_path = filedialog.askopenfilename(defaultextension=".csv",
+                                                       filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
+                                                       title="Open Level")
 
-    mouse_pos = pygame.mouse.get_pos()
-    x = (mouse_pos[0] + scroll_x) // TILE_SIZE
-    y = (mouse_pos[1] + scroll_y) // TILE_SIZE
+                if file_path:
+                    scroll_x, scroll_y = 0, 0
+                    with open(file_path, newline='') as csvfile:
+                        reader = csv.reader(csvfile, delimiter=' ')
+                        loaded_data = []
+                        for row in reader:
+                            loaded_data.append([int(tile) for tile in row])
 
-    if mouse_pos[0] < SCREEN_WIDTH and mouse_pos[1] < SCREEN_HEIGHT:
+                        world_data = loaded_data
+
+                        level_name = os.path.splitext(os.path.basename(file_path))[0]
+
+            if self.exit_button.is_clicked(event):
+                self.running = False
+                self.game_flow.to_main_menu()
+
+        mouse_pos = pygame.mouse.get_pos()
+        x = (mouse_pos[0] + self.scroll_x) // TILE_SIZE
+        y = (mouse_pos[1] + self.scroll_y) // TILE_SIZE
+
+        if mouse_pos[0] < EDITOR_WIDTH and mouse_pos[1] < EDITOR_HEIGHT:
             if pygame.mouse.get_pressed()[0] == 1:
-                if current_tile == 1:
-                    if not player_placed and world_data[y][x] != 1:
-                        world_data[y][x] = 1
-                        player_placed = True
+                if self.current_tile == 1:
+                    if not self.player_placed and self.world_data[y][x] != 1:
+                        self.world_data[y][x] = 1
+                        self.player_placed = True
                 else:
-                    if world_data[y][x] != current_tile:
-                        world_data[y][x] = current_tile
+                    if self.world_data[y][x] != self.current_tile:
+                        self.world_data[y][x] = self.current_tile
             if pygame.mouse.get_pressed()[2] == 1:
-                if player_placed and world_data[y][x] == 1:
-                    player_placed = False
-                world_data[y][x] = 0
+                if self.player_placed and self.world_data[y][x] == 1:
+                    self.player_placed = False
+                self.world_data[y][x] = 0
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
-            pygame.quit()
-            sys.exit()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                scroll_left = True
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                scroll_right = True
-            if event.key == pygame.K_UP or event.key == pygame.K_w:
-                scroll_up = True
-            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                scroll_down = True
-            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
-                scroll_speed_multiplier = 4
+    def update(self):
+        self.scroll()
 
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
-                scroll_left = False
-            if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
-                scroll_right = False
-            if event.key == pygame.K_UP or event.key == pygame.K_w:
-                scroll_up = False
-            if event.key == pygame.K_DOWN or event.key == pygame.K_s:
-                scroll_down = False
-            if event.key == pygame.K_LSHIFT or event.key == pygame.K_RSHIFT:
-                scroll_speed_multiplier = 1
+        self.delta_time = self.clock.tick(FPS)
+        pygame.display.set_caption(f'{self.clock.get_fps() :.1f}')
 
-        for button_count, button in enumerate(button_list):
-            if button.is_clicked(event):
-                current_tile = button_count + 1
+    def draw(self):
+        self.draw_background()
+        self.draw_grid()
+        self.draw_world()
 
-        if save_button.is_clicked(event):
-            file_path = filedialog.asksaveasfilename(defaultextension=".csv",
-                                                     filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
-                                                     title="Save Level As")
+        pygame.draw.rect(self.display, DEEP_RED, (0, EDITOR_HEIGHT, EDITOR_WIDTH + SIDE_MARGIN, LOWER_MARGIN))
+        self.save_button.draw(self.display)
+        self.load_button.draw(self.display)
+        self.exit_button.draw(self.display)
 
-            if file_path:
-                with open(file_path, 'w', newline='') as csvfile:
-                    writer = csv.writer(csvfile, delimiter=' ')
-                    for row in world_data:
-                        writer.writerow(row)
+        pygame.draw.rect(self.display, DARK_RED, (EDITOR_WIDTH, 0, SIDE_MARGIN, EDITOR_HEIGHT))
+        self.draw_text(f'Level name: {self.level_name}', WHITE, 10, EDITOR_HEIGHT + LOWER_MARGIN - 90)
 
-        if load_button.is_clicked(event):
-            file_path = filedialog.askopenfilename(defaultextension=".csv",
-                                                   filetypes=[("Level Files", "*.csv"), ("All Files", "*.*")],
-                                                   title="Open Level")
+        for button in self.button_list:
+            button.draw(self.display)
 
-            if file_path:
-                scroll_x, scroll_y = 0, 0
-                with open(file_path, newline='') as csvfile:
-                    reader = csv.reader(csvfile, delimiter=' ')
-                    loaded_data = []
-                    for row in reader:
-                        loaded_data.append([int(tile) for tile in row])
+        pygame.draw.rect(self.display, BRIGHT_RED, self.button_list[self.current_tile - 1].rect, 3)
 
-                    world_data = loaded_data
+        self.game_flow.gl_renderer.apply_texture(self.display)
 
-                    level_name = os.path.splitext(os.path.basename(file_path))[0]
+        pygame.display.flip()
 
-    draw_background()
-    draw_grid()
-    draw_world()
-
-    pygame.draw.rect(screen, DEEP_RED, (0, SCREEN_HEIGHT, SCREEN_WIDTH + SIDE_MARGIN, LOWER_MARGIN))
-    save_button.draw(screen)
-    load_button.draw(screen)
-
-    pygame.draw.rect(screen, DARK_RED, (SCREEN_WIDTH, 0, SIDE_MARGIN, SCREEN_HEIGHT))
-    draw_text(f'Level name: {level_name}', WHITE, 10, SCREEN_HEIGHT + LOWER_MARGIN - 90)
-
-    for button in button_list:
-        button.draw(screen)
-
-    pygame.draw.rect(screen, BRIGHT_RED, button_list[current_tile - 1].rect, 3)
-
-    pygame.display.flip()
-
-
-# class LevelEditor:
-#     def __init__(self):
-#         self.running = True
-#         self.delta_time = 1
-#
-#     def check_events(self):
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 self.running = False
-#
-#     def update(self):
-#         self.delta_time = clock.tick(FPS)
-#
-#     def draw(self):
-#         pygame.display.flip()
-#
-#     def run(self):
-#         self.running = True
-#         while self.running:
-#             self.check_events()
-#             self.update()
-#             self.draw()
+    def run(self):
+        self.running = True
+        while self.running:
+            self.check_events()
+            self.update()
+            self.draw()

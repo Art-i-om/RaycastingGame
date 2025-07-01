@@ -2,6 +2,7 @@ import pygame
 
 from UI.level_selector import LevelSelectorMenu
 from UI.game_over import GameOverMenu
+from level_editor import LevelEditor
 from game import *
 from settings import *
 import moderngl
@@ -22,6 +23,7 @@ class GameFlow:
         self.main_menu = None
         self.level_selector = None
         self.game_over = None
+        self.level_editor = None
         self.awake_setup()
 
     def awake_setup(self):
@@ -29,6 +31,7 @@ class GameFlow:
         self.level_selector = LevelSelectorMenu(self)
         self.main_menu = MainMenu(self)
         self.game_over = GameOverMenu(self)
+        self.level_editor = LevelEditor(self)
         self.game = Game(self)
         self.gl_renderer = GLRenderer(self.game, self.ctx)
 
@@ -43,6 +46,9 @@ class GameFlow:
 
     def to_level_selector(self):
         self.level_selector.run()
+
+    def to_level_editor(self):
+        self.level_editor.run()
 
     def load_level(self, filepath):
         self.file_path = filepath

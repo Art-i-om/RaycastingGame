@@ -14,7 +14,10 @@ class MainMenu:
         self.start_btn = RectButton(text="Start Game", pos=(HALF_WIDTH - 150, HALF_HEIGHT - 100),
                                     size=(300, 60), font=self.font,
                                     bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
-        self.quit_btn = RectButton(text="Quit", pos=(HALF_WIDTH - 150, HALF_HEIGHT),
+        self.quit_btn = RectButton(text="Quit", pos=(HALF_WIDTH - 150, HALF_HEIGHT + 100),
+                                   size=(300, 60), font=self.font,
+                                   bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
+        self.level_editor_btn = RectButton(text="Level Editor", pos=(HALF_WIDTH - 150, HALF_HEIGHT),
                                    size=(300, 60), font=self.font,
                                    bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
         self.logo = self.logo_font.render("DOOMED", False, (255, 0, 0)).convert_alpha()
@@ -37,6 +40,9 @@ class MainMenu:
             if self.start_btn.is_clicked(event):
                 self.running = False
                 self.game_flow.level_selector.run()
+            if self.level_editor_btn.is_clicked(event):
+                self.running = False
+                self.game_flow.to_level_editor()
             if self.quit_btn.is_clicked(event):
                 pygame.quit()
                 sys.exit()
@@ -50,6 +56,7 @@ class MainMenu:
         self.fire_vfx.draw()
 
         self.start_btn.draw(self.game_flow.display)
+        self.level_editor_btn.draw(self.game_flow.display)
         self.quit_btn.draw(self.game_flow.display)
 
         self.game_flow.gl_renderer.apply_texture(self.game_flow.display)

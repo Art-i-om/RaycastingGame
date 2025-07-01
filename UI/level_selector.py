@@ -25,11 +25,11 @@ class LevelSelectorMenu:
         self.load_file_btn = RectButton(pos=(HALF_WIDTH - 150, HEIGHT - 500), size=(300, 60),
                                         font=self.font, text='Load level',
                                         bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100)
-        )
+                                        )
         self.back_button = RectButton(pos=(HALF_WIDTH - 150, HEIGHT - 400), size=(300, 60),
                                       font=self.font, text='Back',
                                       bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100)
-        )
+                                      )
 
     def check_events(self):
         for event in pygame.event.get():
