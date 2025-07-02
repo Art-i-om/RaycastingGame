@@ -45,7 +45,7 @@ def ray_casting_jit(ox, oy, player_angle, world_array):
         x_hor = ox + depth_hor * cos_a
         delta_depth = dy / sin_a
         dx = delta_depth * cos_a
-        texture_hor = 1
+        texture_hor = 2
         for i in range(MAX_DEPTH):
             tile_hor_x = int(x_hor)
             tile_hor_y = int(y_hor)
@@ -64,7 +64,7 @@ def ray_casting_jit(ox, oy, player_angle, world_array):
         y_vert = oy + depth_vert * sin_a
         delta_depth = dx_vert / cos_a
         dy_vert = delta_depth * sin_a
-        texture_vert = 1
+        texture_vert = 2
         for i in range(MAX_DEPTH):
             tile_vert_x = int(x_vert)
             tile_vert_y = int(y_vert)
@@ -127,7 +127,7 @@ class RayCasting:
         )
 
         for ray in range(len(self.ray_casting_result)):
-            texture = textures[ray]
+            texture = int(textures[ray])
             offset = offsets[ray]
             depth = depths[ray]
             if is_small[ray]:

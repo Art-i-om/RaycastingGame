@@ -39,7 +39,7 @@ class LevelEditor:
             r = [0] * MAX_COLS
             self.world_data.append(r)
         self.save_button = RectButton(
-            (EDITOR_WIDTH - 250, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (500, EDITOR_HEIGHT + LOWER_MARGIN - 75),
             (100, 50),
             "Save",
             bg_color=DEEP_RED,
@@ -47,7 +47,7 @@ class LevelEditor:
             text_color=WHITE
         )
         self.load_button = RectButton(
-            (EDITOR_WIDTH - 100, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (650, EDITOR_HEIGHT + LOWER_MARGIN - 75),
             (100, 50),
             "Load",
             bg_color=DEEP_RED,
@@ -58,6 +58,14 @@ class LevelEditor:
             (EDITOR_WIDTH + 150, EDITOR_HEIGHT + LOWER_MARGIN - 75),
             (100, 50),
             "Exit",
+            bg_color=DEEP_RED,
+            hover_color=BRIGHT_RED,
+            text_color=WHITE
+        )
+        self.clear_button = RectButton(
+            (EDITOR_WIDTH - 100, EDITOR_HEIGHT + LOWER_MARGIN - 75),
+            (100, 50),
+            "Clear",
             bg_color=DEEP_RED,
             hover_color=BRIGHT_RED,
             text_color=WHITE
@@ -170,20 +178,25 @@ class LevelEditor:
                                                        title="Open Level")
 
                 if file_path:
-                    scroll_x, scroll_y = 0, 0
+                    self.scroll_x, self.scroll_y = 0, 0
                     with open(file_path, newline='') as csvfile:
                         reader = csv.reader(csvfile, delimiter=' ')
                         loaded_data = []
                         for row in reader:
                             loaded_data.append([int(tile) for tile in row])
 
-                        world_data = loaded_data
+                        self.world_data = loaded_data
 
-                        level_name = os.path.splitext(os.path.basename(file_path))[0]
+                        self.level_name = os.path.splitext(os.path.basename(file_path))[0]
 
             if self.exit_button.is_clicked(event):
                 self.running = False
                 self.game_flow.to_main_menu()
+
+            if self.clear_button.is_clicked(event):
+                self.world_data = [[0] * MAX_COLS for _ in range(MAX_ROWS)]
+                self.player_placed = False
+                self.level_name = None
 
         mouse_pos = pygame.mouse.get_pos()
         x = (mouse_pos[0] + self.scroll_x) // TILE_SIZE
@@ -218,6 +231,7 @@ class LevelEditor:
         self.save_button.draw(self.display)
         self.load_button.draw(self.display)
         self.exit_button.draw(self.display)
+        self.clear_button.draw(self.display)
 
         pygame.draw.rect(self.display, DARK_RED, (EDITOR_WIDTH, 0, SIDE_MARGIN, EDITOR_HEIGHT))
         self.draw_text(f'Level name: {self.level_name}', WHITE, 10, EDITOR_HEIGHT + LOWER_MARGIN - 90)

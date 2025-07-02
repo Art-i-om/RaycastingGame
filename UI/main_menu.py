@@ -11,9 +11,9 @@ class MainMenu:
         self.game_flow = game_flow
         self.font = pygame.font.Font(main_font, font_size)
         self.logo_font = pygame.font.Font(main_font, logo_font_size)
-        self.start_btn = RectButton(text="Start Game", pos=(HALF_WIDTH - 150, HALF_HEIGHT - 100),
-                                    size=(300, 60), font=self.font,
-                                    bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
+        self.select_level_btn = RectButton(text="Select Level", pos=(HALF_WIDTH - 150, HALF_HEIGHT - 100),
+                                           size=(300, 60), font=self.font,
+                                           bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
         self.quit_btn = RectButton(text="Quit", pos=(HALF_WIDTH - 150, HALF_HEIGHT + 100),
                                    size=(300, 60), font=self.font,
                                    bg_color=(50, 50, 50), text_color=(255, 255, 255), hover_color=(100, 100, 100))
@@ -37,7 +37,7 @@ class MainMenu:
 
     def check_events(self):
         for event in pygame.event.get():
-            if self.start_btn.is_clicked(event):
+            if self.select_level_btn.is_clicked(event):
                 self.running = False
                 self.game_flow.level_selector.run()
             if self.level_editor_btn.is_clicked(event):
@@ -55,7 +55,7 @@ class MainMenu:
 
         self.fire_vfx.draw()
 
-        self.start_btn.draw(self.game_flow.display)
+        self.select_level_btn.draw(self.game_flow.display)
         self.level_editor_btn.draw(self.game_flow.display)
         self.quit_btn.draw(self.game_flow.display)
 
